@@ -7,9 +7,9 @@ namespace DigitalLibraryManager.Services
 {
     internal class Library
     {
-        private static List<Document> _documents = new List<Document>();
+        private List<Document> _documents = new List<Document>();
 
-        public void AddDocument(Document doc)
+        public void Add(Document doc)
         {
             _documents.Add(doc);
         }
@@ -27,10 +27,8 @@ namespace DigitalLibraryManager.Services
             }
         }
 
-        static private List<Document> Find(string keyword)
+        private List<Document> Find(string keyword)
         {
-            try
-            {
                 List<Document> results = _documents.Where(d =>
                d.Title.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
                d.Author.Contains(keyword, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -39,21 +37,24 @@ namespace DigitalLibraryManager.Services
                     throw new Exception("No documents found matching that keyword.");
                 }
                 return results;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return new List<Document>();
-            }
         }
 
         public bool Search(string keyword)
         {
             try
             {
-                var results = Library.Find(keyword);
+                var results = Find(keyword);
+                if (results.Count == 0)
+                {
+                    throw new DocumentNotFoundException($"No documents found matching the keyword: '{keyword}'.");
+                }
                 foreach (var doc in results) doc.DisplayDetails();
                 return true;
+            }
+            catch (DocumentNotFoundException ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
             }
             catch (Exception ex)
             {
@@ -64,30 +65,56 @@ namespace DigitalLibraryManager.Services
 
         public bool Remove(string keyword)
         {
-            try
+            var matches = Find(keyword);
+            if (matches.Count == 0)
             {
-                foreach (Document D in _documents)
-                {
-                    if (D.Title.Contains(keyword, StringComparison.OrdinalIgnoreCase) || D.Author.Contains(keyword, StringComparison.OrdinalIgnoreCase))
-                    {
-                        _documents.Remove(D);
-                        return true;
-                    }
-                }
-            }
-            catch (DocumentNotFoundException ex)
-            {
-                Console.WriteLine(ex.ToString());
+                Console.WriteLine($"No documents found to remove matching the keyword: '{keyword}'.");
                 return false;
             }
-            return false;
-        }
 
-        public void Add(Document doc) 
-        {
-            _documents.Add(doc);
-        }
+            int removedCount = 0;
+            Console.WriteLine($"Found {matches.Count} document(s) matching '{keyword}'.");
+            Console.WriteLine("------------------------------------------");
 
+            foreach (var doc in matches.ToList())
+            {
+                doc.DisplayDetails();
+                Console.Write("Delete this document (Y)es, (N)o, (S)kip the rest? [Y/N/S]: ");
+                string choice = Console.ReadLine()?.Trim().ToUpper() ?? "";
+
+                if (choice == "Y" || choice == "y")
+                {
+                    _documents.Remove(doc);
+                    removedCount++;
+                    Console.WriteLine("Document deleted.");
+                }
+                else if (choice == "S" || choice == "s")
+                {
+                    Console.WriteLine("Skipping the rest of the removal process.");
+                    break;
+                }
+                else if (choice == "N" || choice == "n")
+                {
+                    Console.WriteLine("Skipping document.");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid choice. Skipping document.");
+                }
+                Console.WriteLine("------------------------------------------");
+            }
+
+            if (removedCount > 0)
+            {
+                Console.WriteLine($"Removal complete. {removedCount} document(s) were removed.");
+                return true;
+            }
+            else
+            {
+                Console.WriteLine("No documents were removed.");
+                return false;
+            }
+        }
 
         public bool Save(string filePath)
         {
@@ -100,19 +127,33 @@ namespace DigitalLibraryManager.Services
                     {
                         writer.WriteLine(doc.ToString());
                     }
+                    Console.WriteLine($"Library successfully saved to {filePath}.");
                     return true;
                 }
             }
-            catch (DocumentNotFoundException ex)
+            catch (IOException ex)
             {
-                Console.WriteLine(ex.ToString());
+                Console.WriteLine($"Error saving library to file: {ex.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An unexpected error occurred during save: {ex.Message}");
                 return false;
             }
         }
         public void Load(string filePath)
         {
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine($"Backup file not found at: {filePath}. Starting with an empty library.");
+                return;
+            }
+
             try
             {
+                _documents.Clear();
+
                 using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                 using (StreamReader reader = new StreamReader(fs))
                 {
@@ -124,10 +165,10 @@ namespace DigitalLibraryManager.Services
                         switch (type)
                         {
                             case "Book":
-                                _documents.Add( new Book(Guid.Parse(parts[1]), 
-                                    parts[2], 
-                                    parts[3], 
-                                    int.Parse(parts[4]), 
+                                _documents.Add(new Book(Guid.Parse(parts[1]),
+                                    parts[2],
+                                    parts[3],
+                                    int.Parse(parts[4]),
                                     int.Parse(parts[5])));
                                 break;
                             case "Magazine":
@@ -147,15 +188,20 @@ namespace DigitalLibraryManager.Services
                                     ));
                                 break;
                             default:
-                                Console.WriteLine($"Unknown type: {type}");
+                                Console.WriteLine($"Unknown document type found in file: {type}");
                                 break;
                         }
                     }
+                    Console.WriteLine($"Library successfully loaded from {filePath}.");
                 }
             }
-            catch (DocumentNotFoundException  ex)
+            catch (IOException ex)
             {
-                Console.WriteLine(ex.ToString());
+                Console.WriteLine($"Error loading library from file: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error parsing library data from file: {ex.Message}. Data may be corrupted.");
             }
         }
 

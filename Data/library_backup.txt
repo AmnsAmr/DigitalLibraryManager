@@ -1,0 +1,6 @@
+Book;a1b2c3d4-0000-4000-8000-000000000001;The Art of C#;Bjarne Stroustrup;2023;850
+Magazine;a1b2c3d4-0000-4000-8000-000000000002;The Developer Monthly;Tech Insights Group;2024;42
+PDF;a1b2c3d4-0000-4000-8000-000000000003;Advanced .NET Patterns;Microsoft Press;2022;2.5
+Book;a1b2c3d4-0000-4000-8000-000000000004;Clean Code;Robert C. Martin;2008;464
+PDF;a1b2c3d4-0000-4000-8000-000000000005;Final Exam Study Guide;EMSI Professors;2024;0.75
+Magazine;a1b2c3d4-0000-4000-8000-000000000006;Programming Today;Global Tech Inc.;2024;15
