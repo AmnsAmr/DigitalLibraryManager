@@ -26,5 +26,11 @@ namespace DigitalLibraryManager.Models
         {
             Console.WriteLine($"[MAGAZINE] {Title} by {Author} ({Year}) - Issue N°{IssueNumber} (ID: {Id})");
         }
+
+        public override string ToString()
+        {
+            string Base = base.ToString();
+            return $"{Base},{IssueNumber}";
+        }
     }
 }

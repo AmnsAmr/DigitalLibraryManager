@@ -1,5 +1,7 @@
 ﻿using DigitalLibraryManager.Models;
 using DigitalLibraryManager.Exceptions;
+using System;
+using System.IO;
 
 namespace DigitalLibraryManager.Services
 {
@@ -93,7 +95,7 @@ namespace DigitalLibraryManager.Services
             {
                 try
                 {
-
+                    
                 }
                 catch (DocumentNotFoundException ex)
                 { 

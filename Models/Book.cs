@@ -26,5 +26,11 @@ namespace DigitalLibraryManager.Models
         {
             Console.WriteLine($"[BOOK] {Title} by {Author} ({Year}) - {PageCount} pages (ID: {Id})");
         }
+
+        public override string ToString()
+        {
+            string Base = base.ToString();
+            return $"{Base},{PageCount}";
+        }
     }
 }

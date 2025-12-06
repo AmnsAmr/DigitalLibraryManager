@@ -26,5 +26,11 @@ namespace DigitalLibraryManager.Models
         {
             Console.WriteLine($"[PDF] {Title} by {Author} ({Year}) - {SizeInMB} MB (ID: {Id})");
         }
+
+        public override string ToString()
+        {
+            string Base = base.ToString();
+            return $"{Base},{SizeInMB}";
+        }
     }
 }
