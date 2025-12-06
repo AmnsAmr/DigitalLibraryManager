@@ -29,8 +29,7 @@ namespace DigitalLibraryManager.Models
 
         public override string ToString()
         {
-            string Base = base.ToString();
-            return $"{Base},{SizeInMB}";
+            return $"PDF;{Id};{Title};{Author};{Year};{SizeInMB}";
         }
     }
 }

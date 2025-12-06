@@ -91,19 +91,74 @@ namespace DigitalLibraryManager.Services
 
         public bool Save(string filePath)
         {
-            foreach (Document doc in _documents)
+            try
             {
-                try
+                using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                using (StreamWriter writer = new StreamWriter(fs))
                 {
-                    
+                    foreach (Document doc in _documents)
+                    {
+                        writer.WriteLine(doc.ToString());
+                    }
+                    return true;
                 }
-                catch (DocumentNotFoundException ex)
-                { 
-                    Console.WriteLine(ex.ToString());
+            }
+            catch (DocumentNotFoundException ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return false;
+            }
+        }
+        public void Load(string filePath)
+        {
+            try
+            {
+                List<Book> books = new List<Book>();
+                List<Magazine> magazine = new List<Magazine>();
+                List<PDFDocument> pdf = new List<PDFDocument>();
+                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                using (StreamReader reader = new StreamReader(fs))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        string[] parts = line.Split(';');
+                        string type = parts[0];
+                        switch (type)
+                        {
+                            case "Book":
+                                books.Add( new Book(Guid.Parse(parts[1]), 
+                                    parts[2], 
+                                    parts[3], 
+                                    int.Parse(parts[4]), 
+                                    int.Parse(parts[5])));
+                                break;
+                            case "Magazine":
+                                magazine.Add(new Magazine(Guid.Parse(parts[1]),
+                                    parts[2],
+                                    parts[3],
+                                    int.Parse(parts[4]),
+                                    int.Parse(parts[5])
+                                    ));
+                                break;
+                            case "PDF":
+                                pdf.Add(new PDFDocument(Guid.Parse(parts[1]),
+                                    parts[2],
+                                    parts[3],
+                                    int.Parse(parts[4]),
+                                    double.Parse(parts[5])
+                                    ));
+                                break;
+                            default:
+                                Console.WriteLine($"Unknown type: {type}");
+                                break;
+                        }
+                    }
                 }
-                finally 
-                { 
-                }
+            }
+            catch (DocumentNotFoundException  ex)
+            {
+                Console.WriteLine(ex.ToString());
             }
         }
 

@@ -30,9 +30,6 @@ namespace DigitalLibraryManager.Models
         }
 
         public abstract void DisplayDetails();
-        public override string ToString()
-        {
-            return $"{Id},{Title},{Author},{Year}";
-        }
+        public abstract override string ToString();
     }
 }

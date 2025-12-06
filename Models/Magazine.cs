@@ -29,8 +29,7 @@ namespace DigitalLibraryManager.Models
 
         public override string ToString()
         {
-            string Base = base.ToString();
-            return $"{Base},{IssueNumber}";
+            return $"Magazine;{Id};{Title};{Author};{Year};{IssueNumber}";
         }
     }
 }
