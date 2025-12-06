@@ -113,13 +113,10 @@ namespace DigitalLibraryManager.Services
         {
             try
             {
-                List<Book> books = new List<Book>();
-                List<Magazine> magazine = new List<Magazine>();
-                List<PDFDocument> pdf = new List<PDFDocument>();
                 using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                 using (StreamReader reader = new StreamReader(fs))
                 {
-                    string line;
+                    string? line;
                     while ((line = reader.ReadLine()) != null)
                     {
                         string[] parts = line.Split(';');
@@ -127,14 +124,14 @@ namespace DigitalLibraryManager.Services
                         switch (type)
                         {
                             case "Book":
-                                books.Add( new Book(Guid.Parse(parts[1]), 
+                                _documents.Add( new Book(Guid.Parse(parts[1]), 
                                     parts[2], 
                                     parts[3], 
                                     int.Parse(parts[4]), 
                                     int.Parse(parts[5])));
                                 break;
                             case "Magazine":
-                                magazine.Add(new Magazine(Guid.Parse(parts[1]),
+                                _documents.Add(new Magazine(Guid.Parse(parts[1]),
                                     parts[2],
                                     parts[3],
                                     int.Parse(parts[4]),
@@ -142,7 +139,7 @@ namespace DigitalLibraryManager.Services
                                     ));
                                 break;
                             case "PDF":
-                                pdf.Add(new PDFDocument(Guid.Parse(parts[1]),
+                                _documents.Add(new PDFDocument(Guid.Parse(parts[1]),
                                     parts[2],
                                     parts[3],
                                     int.Parse(parts[4]),
